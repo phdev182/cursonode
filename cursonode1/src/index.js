@@ -7,7 +7,16 @@ const app = express();
 app.use(express.json());
 const projects = [];
 
-app.get('/projects', (request, response) => {
+function logRouts(request, response, next){
+  const { method, url } = request;
+  const route = `[${method.toUpperCase()}] ${url}`;
+  console.log(route);
+  return next();
+}
+
+//app.use(logRouts);
+
+app.get('/projects', logRouts, (request, response) => {
   const { title } = request.query;
   const results = title
       ? projects.filter(project => project.title.includes(title))
@@ -45,7 +54,7 @@ app.put('/projects/:id', (request, response) => {
   return response.json(project);
 });
 
-app.delete('/projects/:id', (request, response) => {
+app.delete('/projects/:id', logRouts, (request, response) => {
   const { id } = request.params;
   const projecIndex = projects.findIndex(project => project.id === id);
   if (projecIndex < 0){
